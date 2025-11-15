@@ -15,6 +15,7 @@
       --accent: #ff6b9a; /* pink */
       --muted: #5b6b7a;
       --card-bg: rgba(255,255,255,0.7);
+      --credit-speed: 50; /* px per second baseline for scroll speed (adjustable) */
     }
 
     *{box-sizing:border-box}
@@ -35,8 +36,32 @@
     h1{font-family:'Great Vibes', cursive;font-size:48px;margin:0 0 8px;color:var(--accent);text-align:center}
     p.lead{color:var(--muted);text-align:center;margin:0 0 20px}
 
+    /* Poem "credits" container */
     .poem{
-      max-width:720px;margin:20px auto;font-size:20px;line-height:1.6;color:#222;padding:22px;background:linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.55));border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)
+      width:100%;max-width:720px;height:320px; /* height controls visible area */
+      margin:20px auto;font-size:20px;line-height:1.8;color:#222;padding:12px;border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);overflow:hidden;position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));
+    }
+
+    /* inner scroll block that will animate upward (movie credits style) */
+    .poem .scroll{
+      display:flex;flex-direction:column;align-items:center;padding:8px 24px;will-change:transform;position:absolute;left:0;right:0;top:100%;
+    }
+
+    .line{white-space:pre-wrap;text-align:center;opacity:0.95;width:100%;max-width:640px}
+
+    .signature{margin-top:18px;font-weight:600;color:var(--muted)}
+    .author{font-weight:700;color:var(--accent)}
+
+    /* Fade top/bottom masks so entering/exiting lines look cinematic */
+    .poem::before,.poem::after{
+      content:'';position:absolute;left:0;right:0;height:48px;pointer-events:none;
+    }
+    .poem::before{top:0;background:linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,0));}
+    .poem::after{bottom:0;background:linear-gradient(0deg, rgba(255,255,255,1), rgba(255,255,255,0));}
+
+    /* accessible reduced motion: if user prefers reduced motion, stop animation and make content static */
+    @media (prefers-reduced-motion: reduce){
+      .poem .scroll{animation:none !important;top:0}
     }
 
     .message{margin-top:18px;text-align:center}
@@ -48,12 +73,8 @@
     .heart{position:absolute;right:22px;top:22px;font-size:22px;transform-origin:center;animation:beat 1.2s ease-in-out infinite}
     @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 
-    /* Reveal animation for poem lines */
-    .line{opacity:0;transform:translateY(6px);transition:all 600ms cubic-bezier(.2,.9,.3,1)}
-    .line.visible{opacity:1;transform:translateY(0)}
-
     /* responsive */
-    @media (max-width:600px){h1{font-size:36px}.poem{font-size:18px;padding:16px}}
+    @media (max-width:600px){h1{font-size:36px}.poem{font-size:18px;padding:10px;height:260px}}
   </style>
 </head>
 <body>
@@ -63,19 +84,52 @@
     <h1>Happy Birthday, Yemeni</h1>
     <p class="lead">A small page I made just for you — open your heart and read ✨</p>
 
-    <div class="poem" aria-label="Poem">
-      <!-- Replace these lines with your poem. Keep each line inside a <div class="line"> for a reveal effect. -->
-      <div class="line">When morning sings your name like light,</div>
-      <div class="line">I hold the quiet dawn within my sight —</div>
-      <div class="line">The world feels soft where your footsteps fall,</div>
-      <div class="line">A thousand stars hush to hear your call.</div>
+    <div class="poem" aria-label="Poem - movie credits scroll" id="poemContainer" tabindex="0">
+      <!-- Movie-credits style: inner .scroll block will animate from below (top:100%) upward through the visible window -->
+      <div class="scroll" id="poemScroll">
+        <div class="line">🌸 Her 30th Sunrise 🌸</div>
+        <div class="line">&nbsp;</div>
 
-      <div class="line" style="margin-top:12px;font-weight:600;color:var(--muted)">— With all my love,</div>
-      <div class="line" style="font-weight:700;color:var(--accent)">Kamina</div>
+        <div class="line">Today the sun rose softly,</div>
+        <div class="line">As if it knew the day was yours—</div>
+        <div class="line">Thirty circles ’round the sun,</div>
+        <div class="line">And still, you bloom with more.</div>
+
+        <div class="line">&nbsp;</div>
+        <div class="line">You carry kindness in your laughter,</div>
+        <div class="line">Courage resting in your eyes,</div>
+        <div class="line">A heart that learns, that loves, that lifts,</div>
+        <div class="line">A spirit made to rise.</div>
+
+        <div class="line">&nbsp;</div>
+        <div class="line">With every year you’ve grown more bright,</div>
+        <div class="line">More gentle, wise, and free—</div>
+        <div class="line">And somehow, in this giant world,</div>
+        <div class="line">Your path still led to me.</div>
+
+        <div class="line">&nbsp;</div>
+        <div class="line">So here’s to every dream you hold,</div>
+        <div class="line">To all the love you give—</div>
+        <div class="line">To new beginnings, boundless hopes,</div>
+        <div class="line">And the life you’re yet to live.</div>
+
+        <div class="line">&nbsp;</div>
+        <div class="line">May this year wrap you in magic,</div>
+        <div class="line">In joy you can’t contain—</div>
+        <div class="line">Happy 30th, my love—</div>
+        <div class="line">May your heart never stop dancing in the rain.</div>
+
+        <div class="line" style="margin-top:18px;font-weight:600;color:var(--muted)">— With all my love,</div>
+        <div class="line" style="font-weight:700;color:var(--accent)">Kamina</div>
+
+        <!-- Add some spacing at the end so the scroll clears the view before repeating -->
+        <div class="line">&nbsp;</div>
+        <div class="line">&nbsp;</div>
+      </div>
     </div>
 
     <div class="message">
-      <div>PS: Click the button to reveal a little surprise.</div>
+      <div>PS: Hover or focus the poem to pause the scroll. Click the button to reveal a little surprise.</div>
       <div class="btns">
         <button class="btn" id="revealBtn">Reveal Surprise</button>
         <button class="btn" id="downloadBtn">Download Poem</button>
@@ -84,25 +138,86 @@
   </div>
 
   <script>
-    // Reveal poem lines one by one
-    const lines = Array.from(document.querySelectorAll('.poem .line'));
-    lines.forEach((el, i) => setTimeout(()=> el.classList.add('visible'), 400 + i*350));
+    // Compute a smooth movie-credits upward scroll whose duration depends on content height.
+    (function(){
+      const container = document.getElementById('poemContainer');
+      const scroll = document.getElementById('poemScroll');
 
-    // Reveal Surprise: simple alert or modal — you can replace with an image or audio
-    document.getElementById('revealBtn').addEventListener('click', ()=>{
-      alert('Happy Birthday! 🎁\nYou are the best thing that ever happened to me.');
-    });
+      function startScroll(){
+        // clear previous animation if any
+        scroll.style.animation = 'none';
+        // ensure layout computed
+        requestAnimationFrame(()=>{
+          const containerH = container.clientHeight;
+          const contentH = scroll.scrollHeight;
+          // If content shorter than container, just center it and don't animate
+          if(contentH <= containerH){
+            scroll.style.position = 'relative';
+            scroll.style.top = '0';
+            return;
+          }
 
-    // Download the poem text as a .txt file
-    document.getElementById('downloadBtn').addEventListener('click', ()=>{
-      const text = lines.map(l => l.textContent.trim()).join('\n');
-      const blob = new Blob([text], {type: 'text/plain'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'poem.txt';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+          // distance to travel = contentH + containerH (start from below container to fully above)
+          const distance = contentH + containerH;
+          // baseline speed px/sec from CSS var --credit-speed
+          const rootStyles = getComputedStyle(document.documentElement);
+          const baseline = parseFloat(rootStyles.getPropertyValue('--credit-speed')) || 50; // px/sec
+          const durationSec = Math.max(8, distance / baseline); // min 8s
+
+          // create keyframes dynamically so duration can vary
+          const animName = 'creditsScroll';
+          // remove old style if exists
+          const old = document.getElementById('credits-keyframes');
+          if(old) old.remove();
+
+          const styleEl = document.createElement('style');
+          styleEl.id = 'credits-keyframes';
+          styleEl.textContent = `@keyframes ${animName} { from { transform: translateY(${containerH}px); } to { transform: translateY(-${contentH}px); } }`;
+          document.head.appendChild(styleEl);
+
+          scroll.style.position = 'absolute';
+          scroll.style.left = '0';
+          scroll.style.right = '0';
+          scroll.style.top = '0';
+          scroll.style.animation = `${animName} ${durationSec}s linear infinite`;
+          scroll.style.willChange = 'transform';
+
+          // pause on hover/focus for accessibility and control
+          container.addEventListener('mouseenter', pauseScroll);
+          container.addEventListener('mouseleave', resumeScroll);
+          container.addEventListener('focusin', pauseScroll);
+          container.addEventListener('focusout', resumeScroll);
+
+          function pauseScroll(){ scroll.style.animationPlayState = 'paused'; }
+          function resumeScroll(){ scroll.style.animationPlayState = 'running'; }
+        });
+      }
+
+      // start once DOM is ready
+      if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startScroll);
+      else startScroll();
+
+      // Recalculate on resize (debounced)
+      let t;
+      window.addEventListener('resize', ()=>{ clearTimeout(t); t = setTimeout(startScroll, 250); });
+
+      // Download the poem text as a .txt file (gathers textContent of lines)
+      document.getElementById('downloadBtn').addEventListener('click', ()=>{
+        const lines = Array.from(scroll.querySelectorAll('.line')).map(l=>l.textContent.trim()).filter(Boolean);
+        const text = lines.join('\n');
+        const blob = new Blob([text], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'poem.txt';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+
+      // Reveal Surprise: simple alert or modal — you can replace with an image or audio
+      document.getElementById('revealBtn').addEventListener('click', ()=>{
+        alert('Happy Birthday! 🎁\nYou are the best thing that ever happened to me.');
+      });
+    })();
   </script>
 </body>
 </html>
