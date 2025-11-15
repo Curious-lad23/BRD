@@ -13,7 +13,7 @@
       --bg: linear-gradient(135deg, #fff7fb 0%, #fffaf0 50%, #f3f7ff 100%);
       --accent: #ff6b9a;
       --muted: #5b6b7a;
-      --card-bg: rgba(255,255,255,0.7);
+      --card-bg: rgba(255,255,255,0.78);
     }
 
     *{box-sizing:border-box}
@@ -24,28 +24,30 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:32px;
+      padding:28px;
       background-image: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=60');
       background-size:cover;
       background-position:center;
+      overflow:hidden;
     }
 
     .overlay{
       position:fixed;
       inset:0;
-      background:rgba(10,10,10,0.25);
+      background:rgba(10,10,10,0.22);
       backdrop-filter:blur(2px);
+      z-index:1;
     }
 
     .card{
       width:100%;
-      max-width:820px;
+      max-width:980px;             /* a bit wider to allow 2-column layout */
       background:var(--card-bg);
-      border-radius:20px;
-      padding:34px;
-      box-shadow:0 10px 30px rgba(16,24,40,0.25);
+      border-radius:18px;
+      padding:28px;
+      box-shadow:0 12px 36px rgba(16,24,40,0.28);
       position:relative;
-      z-index:2;
+      z-index:3;
       margin: 0 auto;
     }
 
@@ -60,24 +62,59 @@
     p.lead{
       color:var(--muted);
       text-align:center;
-      margin:0 0 20px;
+      margin:0 0 18px;
     }
 
+    /* content-row is the flex container for poem + photo */
+    .content-row{
+      display:flex;
+      gap:24px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:nowrap; /* prefer side-by-side on wide screens */
+      margin-top:18px;
+    }
+
+    /* POEM: flexible column */
     .poem{
-      max-width:720px;
-      margin:0 auto;
+      flex:1 1 auto;
+      min-width:320px;
       font-size:20px;
       line-height:1.6;
-      color:#222;
+      color:#1d1d1d;
       padding:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.55));
+      background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.78));
       border-radius:12px;
       box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
+      overflow:hidden;
     }
 
-    .message{text-align:center;margin-top:18px}
+    /* PHOTO container */
+    .photo {
+      flex:0 0 260px;
+      width:260px;
+      text-align:center;
+      align-self:flex-start;
+    }
+    .photo img {
+      width:100%;
+      height:auto;
+      max-width:260px;
+      border-radius:16px;
+      box-shadow:0 6px 22px rgba(0,0,0,0.28);
+      object-fit:cover;
+      object-position:center;
+      opacity:0;
+      transform:translateY(8px);
+      transition:opacity .8s ease, transform .8s ease;
+      display:block;
+      margin:0 auto;
+    }
+    .photo img.visible { opacity:1; transform:translateY(0); }
 
-    .btns{display:flex;gap:12px;justify-content:center;margin-top:18px}
+    .message{text-align:center;margin-top:20px}
+
+    .btns{display:flex;gap:12px;justify-content:center;margin-top:14px}
     .btn{
       padding:10px 16px;
       border-radius:999px;
@@ -88,13 +125,14 @@
       cursor:pointer;
     }
 
-    .heart{
+    .heart {
       position:absolute;
       right:22px;
       top:22px;
       font-size:22px;
       transform-origin:center;
       animation:beat 1.2s ease-in-out infinite;
+      z-index:4;
     }
     @keyframes beat{
       0%,100%{transform:scale(1)}
@@ -111,50 +149,56 @@
       transform:translateY(0);
     }
 
-    #birthday-photo.visible{
-      opacity:1;
-      transform:translateY(0);
+    /* floating hearts */
+    .floating-heart{
+      position:fixed;
+      bottom:-30px;
+      color:#ff6b9a;
+      font-size:22px;
+      animation:floatUp 6s linear infinite;
+      opacity:0.85;
+      z-index:2;
+      pointer-events:none;
     }
 
-    @media(max-width:700px){
-      .content-row{gap:16px;}
-      .poem{flex-basis:100%;}
-      #birthday-photo{
-        flex-basis:100%;
-        max-width:360px;
-        margin:12px auto 0;
-      }
+    @keyframes floatUp {
+      0% { transform: translateY(0) translateX(0) scale(1); opacity:0.85; }
+      50% { transform: translateY(-200px) translateX(20px) scale(1.25); opacity:0.95; }
+      100% { transform: translateY(-480px) translateX(-20px) scale(1); opacity:0; }
+    }
+
+    /* RESPONSIVE: for small screens, stack columns */
+    @media (max-width:880px) {
+      .content-row { flex-wrap:wrap; }
+      .photo { flex: 0 0 100%; width:100%; max-width:360px; margin:10px auto 0; }
+      .poem { min-width: auto; width:100%; padding:18px; }
+      h1 { font-size:38px; }
+    }
+
+    @media (max-width:420px) {
+      h1 { font-size:34px; }
+      .poem { font-size:18px; padding:14px; }
     }
   </style>
 </head>
 
 <body>
-
   <div class="overlay"></div>
 
-  <div class="card" role="main">
+  <!-- floating hearts element container (hearts appended to body by JS) -->
+  <div id="floating-hearts"></div>
 
+  <div class="card" role="main">
     <div class="heart">❤️</div>
 
-    <h1>Happy Birthday, [HerName]</h1>
+    <h1>Happy Birthday, Yemeni</h1>
     <p class="lead">A small page I made just for you — open your heart and read ✨</p>
 
-    <!-- ============================= -->
-    <!-- POEM + PHOTO SECTION          -->
-    <!-- ============================= -->
+    <!-- POEM + PHOTO -->
+    <div class="content-row">
 
-    <div class="content-row" style="
-      display:flex;
-      gap:24px;
-      align-items:flex-start;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      margin-top:20px;
-    ">
-
-      <!-- LEFT: POEM -->
-      <div class="poem" style="flex:1 1 420px; min-width:260px;">
-
+      <!-- POEM -->
+      <div class="poem" aria-label="Poem">
         <div class="line">🌸 Her 30th Sunrise 🌸</div>
         <br>
 
@@ -189,36 +233,23 @@
         <br>
 
         <div class="line" style="margin-top:12px;font-weight:600;color:var(--muted)">— With all my love,</div>
-        <div class="line" style="font-weight:700;color:var(--accent)">[YourName]</div>
-
+        <div class="line" style="font-weight:700;color:var(--accent)">Kamina</div>
       </div>
 
-      <!-- RIGHT: PHOTO -->
-      <div style="flex:0 0 260px; text-align:center; align-self:flex-start;">
-        <img 
-          id="birthday-photo" 
+      <!-- PHOTO -->
+      <div class="photo">
+        <!-- RAW github image link (your repo). onerror sets a soft placeholder if image missing -->
+        <img
+          id="birthday-photo"
           src="https://raw.githubusercontent.com/Curious-lad23/BRD/main/Snapchat-1697213296.jpg"
-          alt="Photo"
-          style="
-            width:100%;
-            max-width:260px;
-            height:auto;
-            border-radius:16px;
-            box-shadow:0 6px 22px rgba(0,0,0,0.28);
-            object-fit:cover;
-            opacity:0;
-            transform:translateY(8px);
-            transition:opacity .8s ease, transform .8s ease;
-          "
+          alt="Yemeni"
+          onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22260%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f4f4f6%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-family=%22Inter,Arial%22 font-size=%2220%22>Photo not found</text></svg>';"
         >
       </div>
 
-    </div>
+    </div> <!-- end content-row -->
 
-    <!-- ============================= -->
-    <!-- BUTTONS SECTION               -->
-    <!-- ============================= -->
-
+    <!-- Buttons -->
     <div class="message">
       <div>PS: Click the button to reveal a little surprise.</div>
       <div class="btns">
@@ -226,26 +257,21 @@
         <button class="btn" id="downloadBtn">Download Poem</button>
       </div>
     </div>
-
-  </div>
-
-  <!-- ============================= -->
-  <!-- JAVASCRIPT                    -->
-  <!-- ============================= -->
+  </div> <!-- end card -->
 
   <script>
     // Animate poem lines
     const lines = Array.from(document.querySelectorAll('.poem .line'));
     lines.forEach((el, i) => {
-      setTimeout(() => el.classList.add('visible'), 400 + i * 350);
+      setTimeout(() => el.classList.add('visible'), 400 + i * 300);
     });
 
-    // Surprise button
+    // Surprise message
     document.getElementById("revealBtn").addEventListener("click", () => {
-      alert("Happy Birthday! 🎁\nYou are the best thing that ever happened to me.");
+      alert("Happy Birthday, Yemeni! 🎁\nYou are the best thing that ever happened to me.\n\n— Kamina");
     });
 
-    // Download Poem
+    // Download poem
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const text = lines.map(l => l.textContent.trim()).join("\n");
       const blob = new Blob([text], { type: "text/plain" });
@@ -257,11 +283,33 @@
     });
 
     // Photo fade-in
-    const img = document.getElementById("birthday-photo");
-    if (img) {
-      img.addEventListener("load", () => img.classList.add("visible"));
-      setTimeout(() => img.classList.add("visible"), 800);
+    const photo = document.getElementById("birthday-photo");
+    if (photo) {
+      photo.addEventListener('load', () => photo.classList.add('visible'));
+      // fallback if image already cached or load event misses
+      setTimeout(() => photo.classList.add('visible'), 900);
     }
+
+    // Floating hearts
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "floating-heart";
+      heart.textContent = "❤";
+      // random horizontal start within visible viewport (avoid edges)
+      const left = Math.max(5, Math.random() * 90);
+      heart.style.left = left + "vw";
+      heart.style.fontSize = (14 + Math.random() * 18) + "px";
+      const dur = (4 + Math.random() * 4);
+      heart.style.animationDuration = dur + "s";
+      document.body.appendChild(heart);
+      // remove after animation completes
+      setTimeout(() => heart.remove(), (dur + 0.5) * 1000);
+    }
+    // create a heart occasionally
+    const heartInterval = setInterval(createHeart, 700);
+
+    // optional: stop hearts after 40 seconds (prevent lifetime annoyances)
+    setTimeout(() => clearInterval(heartInterval), 40000);
   </script>
 
 </body>
